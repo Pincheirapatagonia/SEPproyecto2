@@ -87,6 +87,9 @@ int main(){
 
 	init_platform();
 
+    
+
+    
     //----------------------------------------------------
     // INITIALIZE THE PERIPHERALS & SET DIRECTIONS OF GPIO
     //----------------------------------------------------
@@ -117,14 +120,14 @@ int main(){
         return XST_FAILURE;
 
     //--------Init SD----------
-    int status;
+    int Status;
     XSysMon_Config *ConfigPtr;
     /*
      * Initialize the SysMon driver.
      */
-    status = SD_Init();
+    Status = SD_Init();
 
-    if (status != XST_SUCCESS)
+    if (Status != XST_SUCCESS)
         xil_printf("SD card init failed");
 
     fptr = openFile("logData.csv", 'a');
@@ -146,18 +149,18 @@ int main(){
      * Set the configuration registers for single channel continuous mode
      * of operation for the Temperature channel.
      */
-    status = XSysMon_SetSingleChParams(&SysMonInst, XSM_CH_TEMP,
+    Status = XSysMon_SetSingleChParams(&SysMonInst, XSM_CH_TEMP,
                                        FALSE, FALSE, FALSE);
-    if (status != XST_SUCCESS)
+    if (Status != XST_SUCCESS)
     {
         return XST_FAILURE;
     }
     /*
      * Setup the interrupt system.
      */
-    status = SysMonSetupInterruptSystem(&InterruptController,
+    Status = SysMonSetupInterruptSystem(&InterruptController,
                                         &SysMonInst, XPAR_FABRIC_XADC_WIZ_0_IP2INTC_IRPT_INTR);
-    if (status != XST_SUCCESS)
+    if (Status != XST_SUCCESS)
     {
         return XST_FAILURE;
     }
@@ -169,10 +172,7 @@ int main(){
      * Enable global interrupt of System Monitor.
      */
     XSysMon_IntrGlobalEnable(&SysMonInst);
-
     
-   
-
     int num = 0;
     int i;
 
@@ -272,7 +272,7 @@ void SW_Intr_Handler(void *InstancePtr)
     // Ignore additional switches moves
 
     // Solo reaccionar cuando se acciona el switch y no cuando se suelta (debouncer)
-    if ((XGpio_InterruptGetstatus(&SWInst) & SW_INT) != SW_INT)
+    if ((XGpio_InterruptGetStatus(&SWInst) & SW_INT) != SW_INT)
     {
         return;
     }
@@ -354,82 +354,77 @@ int IntcInitFunction(u16 DeviceId, XTmrCtr *TmrInstancePtr)
 
         return XST_SUCCESS;
     }
-    static void SysMonInterruptHandler(void *CallBackRef)
-    {
-        u32 IntrstatusValue;
-        u16 TempRawData;
-        float TempData;
-        XSysMon *SysMonPtr = (XSysMon *)CallBackRef;
-        /*
-         * Get the interrupt status from the device and check the value.
-         */
-        XSysMon_IntrGlobalDisable(&SysMonInst);
-        IntrstatusValue = XSysMon_IntrGetstatus(SysMonPtr);
-        XSysMon_IntrClear(SysMonPtr, IntrstatusValue);
-        logNum++;
+static void SysMonInterruptHandler(void *CallBackRef)
+{
+	u32 IntrStatusValue;
+	u16 TempRawData;
+	float TempData;
+	XSysMon *SysMonPtr = (XSysMon *)CallBackRef;
+	/*
+	 * Get the interrupt status from the device and check the value.
+	 */
+	XSysMon_IntrGlobalDisable(&SysMonInst);
+	IntrStatusValue = XSysMon_IntrGetStatus(SysMonPtr);
+	XSysMon_IntrClear(SysMonPtr, IntrStatusValue);
+	logNum++;
 
-        if (IntrstatusValue & XSM_IPIXR_EOC_MASK)
-        {
-            TempRawData = XSysMon_GetAdcData(&SysMonInst, XSM_CH_TEMP);
-            TempData = XSysMon_RawToTemperature(TempRawData);
-            printf("\r\nThe Current Temperature is %0.3f Centigrades. %d\r\n", TempData, logNum);
-            sprintf(dataPntr, "%0.3f\n", TempData);
-            dataPntr = dataPntr + 8;
+	if (IntrStatusValue & XSM_IPIXR_EOC_MASK) {
+		TempRawData = XSysMon_GetAdcData(&SysMonInst, XSM_CH_TEMP);
+		TempData = XSysMon_RawToTemperature(TempRawData);
+		printf("\r\nThe Current Temperature is %0.3f Centigrades. %d\r\n",TempData,logNum);
+		sprintf(dataPntr,"%0.3f\n",TempData);
+		dataPntr = dataPntr+8;
 
-            if (logNum % 10 == 0)
-            {
-            xil_printf("Updating SD card...\n\r");
-            writeFile(fptr, 80, (u32)dataBuffer);
-            dataPntr = (char *)dataBuffer;
-            }
+		if(logNum%10 == 0){
+			xil_printf("Updating SD card...\n\r");
+			writeFile(fptr, 80, (u32)dataBuffer);
+			dataPntr = (char *)dataBuffer;
+		}
 
-            if (logNum == MAX_LOG_NUM)
-            {
-            closeFile(fptr);
-            SD_Eject();
-            xil_printf("Safe to remove SD Card...\n\r");
-            XSysMon_IntrGlobalDisable(&SysMonInst);
-            }
-            else
-            {
-            sleep(1);
-            XSysMon_IntrGlobalEnable(&SysMonInst);
-            }
-        }
-    }
+		if(logNum == MAX_LOG_NUM){
+			closeFile(fptr);
+			SD_Eject();
+			xil_printf("Safe to remove SD Card...\n\r");
+			XSysMon_IntrGlobalDisable(&SysMonInst);
+		}
+		else{
+			sleep(1);
+			XSysMon_IntrGlobalEnable(&SysMonInst);
+		}
+	}
 
-    static int SysMonSetupInterruptSystem(XScuGic *IntcInstancePtr,
-                                          XSysMon *SysMonPtr,
-                                          u16 IntrId)
-    {
-        int status;
-        XScuGic_Config *IntcConfig;
-        IntcConfig = XScuGic_LookupConfig(XPAR_SCUGIC_SINGLE_DEVICE_ID);
-        if (NULL == IntcConfig)
-        {
-            return XST_FAILURE;
-        }
+ }
 
-        status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-                                       IntcConfig->CpuBaseAddress);
-        if (status != XST_SUCCESS)
-        {
-            return XST_FAILURE;
-        }
-        XScuGic_SetPriorityTriggerType(IntcInstancePtr, IntrId,
-                                       0xA0, 0x3);
-        status = XScuGic_Connect(IntcInstancePtr, IntrId,
-                                 (Xil_ExceptionHandler)SysMonInterruptHandler,
-                                 SysMonPtr);
-        if (status != XST_SUCCESS)
-        {
-            return status;
-        }
-        XScuGic_Enable(IntcInstancePtr, IntrId);
 
-        Xil_ExceptionInit();
-        Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT, (Xil_ExceptionHandler)XScuGic_InterruptHandler, (void *)IntcInstancePtr);
-        Xil_ExceptionEnable();
+static int SysMonSetupInterruptSystem(XScuGic* IntcInstancePtr,
+				      XSysMon *SysMonPtr,
+				      u16 IntrId )
+{
+	int Status;
+	XScuGic_Config *IntcConfig;
+	IntcConfig = XScuGic_LookupConfig(XPAR_SCUGIC_SINGLE_DEVICE_ID);
+	if (NULL == IntcConfig) {
+		return XST_FAILURE;
+	}
 
-        return XST_SUCCESS;
-    }
+	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
+					IntcConfig->CpuBaseAddress);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
+	XScuGic_SetPriorityTriggerType(IntcInstancePtr, IntrId,
+					0xA0, 0x3);
+	Status = XScuGic_Connect(IntcInstancePtr, IntrId,
+				 (Xil_ExceptionHandler)SysMonInterruptHandler,
+				 SysMonPtr);
+	if (Status != XST_SUCCESS) {
+		return Status;
+	}
+	XScuGic_Enable(IntcInstancePtr, IntrId);
+
+	Xil_ExceptionInit();
+	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,(Xil_ExceptionHandler)XScuGic_InterruptHandler,(void *)IntcInstancePtr);
+	Xil_ExceptionEnable();
+
+	return XST_SUCCESS;
+}
