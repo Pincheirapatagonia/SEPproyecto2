@@ -87,61 +87,6 @@ int main(){
 
 	init_platform();
 
-    //--------Init SD----------
-    int Status;
-    XSysMon_Config *ConfigPtr;
-    /*
-     * Initialize the SysMon driver.
-     */
-    Status = SD_Init();
-
-    if (Status != XST_SUCCESS)
-        xil_printf("SD card init failed");
-
-    fptr = openFile("logData.csv", 'a');
-
-    if (fptr == 0)
-        printf("File opening failed\n\r");
-
-    ConfigPtr = XSysMon_LookupConfig(XPAR_SYSMON_0_DEVICE_ID);
-    if (ConfigPtr == NULL)
-    {
-        return XST_FAILURE;
-    }
-    XSysMon_CfgInitialize(&SysMonInst, ConfigPtr, ConfigPtr->BaseAddress);
-    /*
-     * Set the sequencer in Single channel mode.
-     */
-    XSysMon_SetSequencerMode(&SysMonInst, XSM_SEQ_MODE_SINGCHAN);
-    /*
-     * Set the configuration registers for single channel continuous mode
-     * of operation for the Temperature channel.
-     */
-    Status = XSysMon_SetSingleChParams(&SysMonInst, XSM_CH_TEMP,
-                                       FALSE, FALSE, FALSE);
-    if (Status != XST_SUCCESS)
-    {
-        return XST_FAILURE;
-    }
-    /*
-     * Setup the interrupt system.
-     */
-    Status = SysMonSetupInterruptSystem(&InterruptController,
-                                        &SysMonInst, XPAR_FABRIC_XADC_WIZ_0_IP2INTC_IRPT_INTR);
-    if (Status != XST_SUCCESS)
-    {
-        return XST_FAILURE;
-    }
-    /*
-     * Enable EOC interrupt
-     */
-    XSysMon_IntrEnable(&SysMonInst, XSM_IPIXR_EOC_MASK);
-    /*
-     * Enable global interrupt of System Monitor.
-     */
-    XSysMon_IntrGlobalEnable(&SysMonInst);
-
-    
     //----------------------------------------------------
     // INITIALIZE THE PERIPHERALS & SET DIRECTIONS OF GPIO
     //----------------------------------------------------
@@ -170,6 +115,63 @@ int main(){
     status = IntcInitFunction3(INTC_DEVICE_ID, &SWInst);
     if (status != XST_SUCCESS)
         return XST_FAILURE;
+
+    //--------Init SD----------
+    int status;
+    XSysMon_Config *ConfigPtr;
+    /*
+     * Initialize the SysMon driver.
+     */
+    status = SD_Init();
+
+    if (status != XST_SUCCESS)
+        xil_printf("SD card init failed");
+
+    fptr = openFile("logData.csv", 'a');
+
+    if (fptr == 0)
+        printf("File opening failed\n\r");
+
+    ConfigPtr = XSysMon_LookupConfig(XPAR_SYSMON_0_DEVICE_ID);
+    if (ConfigPtr == NULL)
+    {
+        return XST_FAILURE;
+    }
+    XSysMon_CfgInitialize(&SysMonInst, ConfigPtr, ConfigPtr->BaseAddress);
+    /*
+     * Set the sequencer in Single channel mode.
+     */
+    XSysMon_SetSequencerMode(&SysMonInst, XSM_SEQ_MODE_SINGCHAN);
+    /*
+     * Set the configuration registers for single channel continuous mode
+     * of operation for the Temperature channel.
+     */
+    status = XSysMon_SetSingleChParams(&SysMonInst, XSM_CH_TEMP,
+                                       FALSE, FALSE, FALSE);
+    if (status != XST_SUCCESS)
+    {
+        return XST_FAILURE;
+    }
+    /*
+     * Setup the interrupt system.
+     */
+    status = SysMonSetupInterruptSystem(&InterruptController,
+                                        &SysMonInst, XPAR_FABRIC_XADC_WIZ_0_IP2INTC_IRPT_INTR);
+    if (status != XST_SUCCESS)
+    {
+        return XST_FAILURE;
+    }
+    /*
+     * Enable EOC interrupt
+     */
+    XSysMon_IntrEnable(&SysMonInst, XSM_IPIXR_EOC_MASK);
+    /*
+     * Enable global interrupt of System Monitor.
+     */
+    XSysMon_IntrGlobalEnable(&SysMonInst);
+
+    
+   
 
     int num = 0;
     int i;
@@ -270,7 +272,7 @@ void SW_Intr_Handler(void *InstancePtr)
     // Ignore additional switches moves
 
     // Solo reaccionar cuando se acciona el switch y no cuando se suelta (debouncer)
-    if ((XGpio_InterruptGetStatus(&SWInst) & SW_INT) != SW_INT)
+    if ((XGpio_InterruptGetstatus(&SWInst) & SW_INT) != SW_INT)
     {
         return;
     }
@@ -354,7 +356,7 @@ int IntcInitFunction(u16 DeviceId, XTmrCtr *TmrInstancePtr)
     }
     static void SysMonInterruptHandler(void *CallBackRef)
     {
-        u32 IntrStatusValue;
+        u32 IntrstatusValue;
         u16 TempRawData;
         float TempData;
         XSysMon *SysMonPtr = (XSysMon *)CallBackRef;
@@ -362,11 +364,11 @@ int IntcInitFunction(u16 DeviceId, XTmrCtr *TmrInstancePtr)
          * Get the interrupt status from the device and check the value.
          */
         XSysMon_IntrGlobalDisable(&SysMonInst);
-        IntrStatusValue = XSysMon_IntrGetStatus(SysMonPtr);
-        XSysMon_IntrClear(SysMonPtr, IntrStatusValue);
+        IntrstatusValue = XSysMon_IntrGetstatus(SysMonPtr);
+        XSysMon_IntrClear(SysMonPtr, IntrstatusValue);
         logNum++;
 
-        if (IntrStatusValue & XSM_IPIXR_EOC_MASK)
+        if (IntrstatusValue & XSM_IPIXR_EOC_MASK)
         {
             TempRawData = XSysMon_GetAdcData(&SysMonInst, XSM_CH_TEMP);
             TempData = XSysMon_RawToTemperature(TempRawData);
@@ -400,7 +402,7 @@ int IntcInitFunction(u16 DeviceId, XTmrCtr *TmrInstancePtr)
                                           XSysMon *SysMonPtr,
                                           u16 IntrId)
     {
-        int Status;
+        int status;
         XScuGic_Config *IntcConfig;
         IntcConfig = XScuGic_LookupConfig(XPAR_SCUGIC_SINGLE_DEVICE_ID);
         if (NULL == IntcConfig)
@@ -408,20 +410,20 @@ int IntcInitFunction(u16 DeviceId, XTmrCtr *TmrInstancePtr)
             return XST_FAILURE;
         }
 
-        Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
+        status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
                                        IntcConfig->CpuBaseAddress);
-        if (Status != XST_SUCCESS)
+        if (status != XST_SUCCESS)
         {
             return XST_FAILURE;
         }
         XScuGic_SetPriorityTriggerType(IntcInstancePtr, IntrId,
                                        0xA0, 0x3);
-        Status = XScuGic_Connect(IntcInstancePtr, IntrId,
+        status = XScuGic_Connect(IntcInstancePtr, IntrId,
                                  (Xil_ExceptionHandler)SysMonInterruptHandler,
                                  SysMonPtr);
-        if (Status != XST_SUCCESS)
+        if (status != XST_SUCCESS)
         {
-            return Status;
+            return status;
         }
         XScuGic_Enable(IntcInstancePtr, IntrId);
 
