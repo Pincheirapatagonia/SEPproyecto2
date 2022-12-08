@@ -87,13 +87,10 @@ int main(){
 
 	init_platform();
 
-    
-
-    
     //----------------------------------------------------
     // INITIALIZE THE PERIPHERALS & SET DIRECTIONS OF GPIO
     //----------------------------------------------------
-
+    int status;
     // Initialize Switches
     status = XGpio_Initialize(&SWInst, SWS_DEVICE_ID);
     if (status != XST_SUCCESS)
@@ -172,7 +169,7 @@ int main(){
      * Enable global interrupt of System Monitor.
      */
     XSysMon_IntrGlobalEnable(&SysMonInst);
-    
+
     int num = 0;
     int i;
 
