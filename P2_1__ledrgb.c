@@ -35,13 +35,8 @@ XGpio SWInst;
 XScuGic INTCInst; // se usa para btn y sw
 XTmrCtr TMRInst;
 
-
-
-
 static int sw_value;
 static int tmr_count;
-
-
 
 // static void TMR_Intr_Handler(void *baseaddr_p);
 // handler (manipulador) de la interrupcion del timer
