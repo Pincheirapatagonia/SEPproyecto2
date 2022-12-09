@@ -137,7 +137,7 @@ int main()
             (ptr->usado) = 1;
             strcat(name, ".txt");
             strncpy((ptr->target), name, 50);
-            printf("name is %s, saved in %s \n", (ptr->nombre), (ptr->target));
+            xil_printf("name is %s, saved in %s \n", (ptr->nombre), (ptr->target));
         }
         break;
 
