@@ -130,6 +130,7 @@ int main()
         if (btn_value != 0)
         {
             ptr = &cancion[sw_value];
+            xil_printf("Ingrese nombre de la cancion");
             scanf("%s", name);
             strncpy((ptr->nombre), name, 50);
             (ptr->id) = sw_value;
@@ -166,7 +167,10 @@ void delay_ds(int delay)
     }
     // tmr_count = 0;
 }
-
+void print_menu()
+{
+    xil_printf("Ingresando a flag 0");
+}
 void flashear(void)
 {
 
