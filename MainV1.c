@@ -119,8 +119,10 @@ int main()
     struct canciones cancion[4], *ptr;
 
     ptr = &cancion[0];
-    int flag;
+    int flag=0;
     char name[50];
+
+    xil_printf("Iniciando...");
     switch (flag)
     {
     case 0: // Menu
