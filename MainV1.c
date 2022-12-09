@@ -81,8 +81,28 @@ int aux = 0;
 int main()
 {
 
-    
+    int flag;
 
+
+    switch (flag)
+    {
+    case 0: //Menu
+        
+        if(btn_value != 0){}
+        break;
+    
+    case 1: //Ingresar nombre e ID de la canción
+
+
+
+
+    case 2: // Grabar la canción
+
+    case 3: // Reproducir canción
+
+    default:
+        break;
+    }
 
 
 
