@@ -41,6 +41,9 @@ XScuGic InterruptController; /* Instance of the XIntc driver. */
 // los switches y su controlador
 #define SWS_DEVICE_ID XPAR_AXI_GPIO_SWITCHES_DEVICE_ID
 #define INTCS_GPIO_INTERRUPT_ID XPAR_FABRIC_AXI_GPIO_SWITCHES_IP2INTC_IRPT_INTR // S de sw
+// los botones y su controlador
+#define BTNS_DEVICE_ID XPAR_AXI_GPIO_BUTTONS_DEVICE_ID
+#define INTC_GPIO_INTERRUPT_ID XPAR_FABRIC_AXI_GPIO_BUTTONS_IP2INTC_IRPT_INTR
 
 // el timer y su controlador
 #define TMR_DEVICE_ID XPAR_TMRCTR_0_DEVICE_ID
@@ -51,25 +54,34 @@ XScuGic InterruptController; /* Instance of the XIntc driver. */
 // empieza a contar desde TMR_LOAD hasta 0xFFFFFFFF con una frecuencia de 50MHz
 // para obtener un tiempo de T segundos
 #define TMR_LOAD (0xFFFFFFFF - 100000000 * 0.1) // 0.1s Timer
+
+// Define los leds que no necesitan interrupcion
+#define INTC_DEVICE_ID XPAR_PS7_SCUGIC_0_DEVICE_ID
+#define LEDS_DEVICE_ID XPAR_AXI_GPIO_LED_DEVICE_ID
+
 #define SW_INT XGPIO_IR_CH1_MASK
+#define BTN_INT XGPIO_IR_CH1_MASK
 
 XGpio BTNInst;
 XGpio SWInst;
+XGpio LEDInst;
 XScuGic INTCInst; // se usa para btn y sw
 XTmrCtr TMRInst;
 
 static int sw_value;
 static int tmr_count;
+static int led_data;
+static int btn_data;
 
 //------Structs--------
 
 struct canciones
 {
     char nombre[50];
+    char target[50];
     short unsigned int id;
     short unsigned int usado;
-}
-
+};
     // static void TMR_Intr_Handler(void *baseaddr_p);
     // handler (manipulador) de la interrupcion del timer
     static void TMR_Intr_Handler(void *baseaddr_p); //(en ayudantias)
@@ -81,13 +93,26 @@ struct canciones
 
     static int IntcInitFunction(u16 DeviceId, XTmrCtr *TmrInstancePtr); //(en ayudantias)
 
-    // relacionado a la instancia del gpio (SW)
-    static int InterruptSystemSetup3(XScuGic *XScuGicInstancePtr);
-    static int IntcInitFunction3(u16 DeviceId, XGpio *GpioInstancePtr);
 
     void delay_ds(int delay);
 
     int aux = 0;
+
+    static void TMR_Intr_Handler(void *baseaddr_p); //(en ayudantias)
+    static void BTN_Intr_Handler(void *baseaddr_p); //(en ayudantias)
+    static void SW_Intr_Handler(void *baseaddr_p);
+
+    //----------- Controladores de las interrupciones ----------
+    // relacionado al timer (TMR)
+    static int InterruptSystemSetup(XScuGic *XScuGicInstancePtr);       //(en ayudantias)
+    static int IntcInitFunction(u16 DeviceId, XTmrCtr *TmrInstancePtr); //(en ayudantias)
+    // relacionado a la instancia del gpio (BTN)
+    static int InterruptSystemSetup2(XScuGic *XScuGicInstancePtr);      //(en ayudantias)
+    static int IntcInitFunction2(u16 DeviceId, XGpio *GpioInstancePtr); //(en ayudantias)
+    // relacionado a la instancia del gpio (SW)
+    static int InterruptSystemSetup3(XScuGic *XScuGicInstancePtr);
+    static int IntcInitFunction3(u16 DeviceId, XGpio *GpioInstancePtr);
+
     int main()
     {
 
@@ -96,7 +121,7 @@ struct canciones
 
     ptr = &cancion[0];
     int flag;
-
+    char name[50];
     switch (flag)
     {
     case 0: // Menu
@@ -105,7 +130,14 @@ struct canciones
 
         if (btn_value != 0)
         {
-            flag = sw_value;
+            ptr = &cancion[sw_value];
+            scanf("%s", name);
+            strncpy((ptr->nombre), name, 50);
+            (ptr->id) = sw_value;
+            (ptr->usado) = 1;
+            strcat(name, ".txt");
+            strncpy((ptr->target), name, 50);
+            printf("name is %s, saved in %s \n", (ptr->nombre), (ptr->target));
         }
         break;
 
@@ -149,16 +181,7 @@ struct canciones
         delay_ds(5);
     }
 
-    char make_title(struct canciones *ptr)
-    {
-        char src[50], dest[50];
-
-        strcpy(src, (ptr->nombre));
-        strcpy(ext, ".txt");
-
-        return (strncat(src, ext, 50));
-    }
-
+   
         void TMR_Intr_Handler(void *data)
     {
         if (XTmrCtr_IsExpired(&TMRInst, 0))
@@ -210,7 +233,97 @@ struct canciones
             return XST_FAILURE;
         // Funcion relacionada al sistema de gpio (botones, switches)
     }
+    int InterruptSystemSetup(XScuGic *XScuGicInstancePtr)
+    {
+        // Enable interrupt de botones
+        XGpio_InterruptEnable(&BTNInst, BTN_INT);
+        XGpio_InterruptGlobalEnable(&BTNInst);
+        Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
 
+                                     (Xil_ExceptionHandler)XScuGic_InterruptHandler,
+                                     XScuGicInstancePtr);
+        Xil_ExceptionEnable();
+        return XST_SUCCESS;
+    }
+    // Funcion relacionada al timer
+    int IntcInitFunction(u16 DeviceId, XTmrCtr *TmrInstancePtr)
+    {
+        XScuGic_Config *IntcConfig;
+        int status;
+
+        // Interrupt controller initialization
+        // le asigna la configuracion que encontr  del device (lookup) del device
+        IntcConfig = XScuGic_LookupConfig(DeviceId);
+        status = XScuGic_CfgInitialize(&INTCInst, IntcConfig, IntcConfig->CpuBaseAddress); // lo inicializa
+        if (status != XST_SUCCESS)
+            return XST_FAILURE;
+
+        // Call to interrupt setup
+        status = InterruptSystemSetup(&INTCInst); // llama a la funcion InterruptSystemSetup que definimos en este c digo
+        if (status != XST_SUCCESS)
+            return XST_FAILURE;
+
+        // Connect timer interrupt to handler
+        status = XScuGic_Connect(&INTCInst,
+                                 INTC_TMR_INTERRUPT_ID,
+                                 (Xil_ExceptionHandler)TMR_Intr_Handler,
+                                 (void *)TmrInstancePtr);
+        if (status != XST_SUCCESS)
+            return XST_FAILURE;
+
+        // Enable  (habilita) timer interrupts in the controller
+
+        XScuGic_Enable(&INTCInst, INTC_TMR_INTERRUPT_ID);
+
+        return XST_SUCCESS;
+    }
+
+    // Funcion igual a la 1
+    int InterruptSystemSetup2(XScuGic *XScuGicInstancePtr)
+    {
+        // Enable interrupt
+        XGpio_InterruptEnable(&BTNInst, BTN_INT);
+        XGpio_InterruptGlobalEnable(&BTNInst);
+        Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
+                                     (Xil_ExceptionHandler)XScuGic_InterruptHandler,
+                                     XScuGicInstancePtr);
+        Xil_ExceptionEnable();
+        return XST_SUCCESS;
+    }
+
+    // Funcion relacionada al sistema de gpio (botones, switches)
+    int IntcInitFunction2(u16 DeviceId, XGpio *GpioInstancePtr)
+    {
+        XScuGic_Config *IntcConfig;
+        int status;
+        // Interrupt controller initialization
+        IntcConfig = XScuGic_LookupConfig(DeviceId);
+        status = XScuGic_CfgInitialize(&INTCInst, IntcConfig, IntcConfig->CpuBaseAddress);
+        if (status != XST_SUCCESS)
+            return XST_FAILURE;
+
+        // Call to interrupt setup
+        status = InterruptSystemSetup2(&INTCInst);
+        if (status != XST_SUCCESS)
+            return XST_FAILURE;
+
+        // Connect GPIO interrupt to handler
+        status = XScuGic_Connect(&INTCInst,
+                                 INTC_GPIO_INTERRUPT_ID,
+                                 (Xil_ExceptionHandler)BTN_Intr_Handler,
+                                 (void *)GpioInstancePtr);
+        if (status != XST_SUCCESS)
+            return XST_FAILURE;
+
+        // Enable GPIO interrupts interrupt
+        XGpio_InterruptEnable(GpioInstancePtr, 1);
+        XGpio_InterruptGlobalEnable(GpioInstancePtr);
+
+        // Enable GPIO and timer interrupts in the controller
+        XScuGic_Enable(&INTCInst, INTC_GPIO_INTERRUPT_ID);
+
+        return XST_SUCCESS;
+    }
     // probando los switches
     int InterruptSystemSetup3(XScuGic *XScuGicInstancePtr)
     {
