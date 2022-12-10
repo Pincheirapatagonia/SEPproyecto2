@@ -111,6 +111,59 @@ int main()
 
     init_platform();
     struct canciones cancion[4], *ptr;
+    int status;
+    //----------------------------------------------------
+    // INITIALIZE THE PERIPHERALS & SET DIRECTIONS OF GPIO
+    //----------------------------------------------------
+    // Initialize LEDs
+    status = XGpio_Initialize(&LEDInst, LEDS_DEVICE_ID);
+    if (status != XST_SUCCESS)
+        return XST_FAILURE;
+    // Initialize Push Buttons
+    status = XGpio_Initialize(&BTNInst, BTNS_DEVICE_ID);
+    if (status != XST_SUCCESS)
+        return XST_FAILURE;
+    // Initialize Switches
+    status = XGpio_Initialize(&SWInst, SWS_DEVICE_ID);
+    if (status != XST_SUCCESS)
+        return XST_FAILURE;
+
+    // Set LEDs direction to outputs
+    // setea los leds como outputs (ceros), si fueran 1 serian entradas
+    XGpio_SetDataDirection(&LEDInst, 1, 0x00);
+
+    // Set all buttons direction to inputs
+    // 0xFF indica que son entradas
+    XGpio_SetDataDirection(&BTNInst, 1, 0xFF);
+
+    // Set all switches direction to inputs
+    XGpio_SetDataDirection(&SWInst, 1, 0xFF);
+
+    // SETUP THE TIMER
+    //----------------------------------------------------
+    status = XTmrCtr_Initialize(&TMRInst, TMR_DEVICE_ID);
+    if (status != XST_SUCCESS)
+        return XST_FAILURE;
+    XTmrCtr_SetHandler(&TMRInst, (XTmrCtr_Handler)TMR_Intr_Handler, &TMRInst);
+    // el valor de reset es del cual empieza a contar hasta los 32 bits a una frecuencia de 50MHz
+    XTmrCtr_SetResetValue(&TMRInst, 0, TMR_LOAD);                                  // setea el valor del reset llamado TMR_LOAD
+    XTmrCtr_SetOptions(&TMRInst, 0, XTC_INT_MODE_OPTION | XTC_AUTO_RELOAD_OPTION); // setea opciones
+
+    // Initialize interrupt controller (controlador de interrupciones)
+    status = IntcInitFunction(INTC_DEVICE_ID, &TMRInst);
+    if (status != XST_SUCCESS)
+        return XST_FAILURE;
+    XTmrCtr_Start(&TMRInst, 0);
+    // FIN PEDAZO CODIGO TIMER EN MAIN
+
+    // Initialize interrupt controller del boton
+    status = IntcInitFunction2(INTC_DEVICE_ID, &BTNInst);
+    if (status != XST_SUCCESS)
+        return XST_FAILURE;
+    // Initialize interrupt controller de los sw
+    status = IntcInitFunction3(INTC_DEVICE_ID, &SWInst);
+    if (status != XST_SUCCESS)
+        return XST_FAILURE;
 
     //flashear();
 
