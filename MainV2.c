@@ -185,6 +185,7 @@ int main()
     ptr = &cancion[0];
     int flag = 0;
     char name[50];
+    int go =0;
     xil_printf("7Iniciando antes...\r"); //Si imprime
 
     xil_printf("Iniciando...\r"); //Si imprime
@@ -196,10 +197,24 @@ int main()
     case 0: // Menu
         flashear();
         print_menu();
+        go =0;
 
-        if (btn_value > 0)
+        flag = sw_value;
+
+        break;
+
+    case 1: // Ingresar nombre e ID de la canción
+
+        xil_printf("Entrando a case 1\r");
+        xil_printf("Cambie el switch a al n\r");
+        if (btn_value>0)
         {
             ptr = &cancion[sw_value];
+            go = 1;
+        }
+
+        if (go > 0)
+        {
             xil_printf("Ingrese nombre de la cancion: ");
             scanf("%s", name);
             strncpy((ptr->nombre), name, 50);
@@ -208,78 +223,72 @@ int main()
             strcat(name, ".txt");
             strncpy((ptr->target), name, 50);
             xil_printf("name is %s, saved in %s \n", (ptr->nombre), (ptr->target));
+            flag =0;
         }
-        break;
 
-    case 1: // Ingresar nombre e ID de la canción
-
-        xil_printf("Entrando a case 1\r");
-        //no estra a este switch
-        switch (sw_value)
-        {
-        case 0:
-            Xil_Out32(MY_PWM, 0);
-            Xil_Out32(MY_PWM + 4, 0);
-            Xil_Out32(MY_PWM + 8, 0);
-            break;
-        case 1:
-            Xil_Out32(MY_PWM, 4 * 255);
-            Xil_Out32(MY_PWM + 4, 0);
-            Xil_Out32(MY_PWM + 8, 0);
-            break;
-        case 2:
-        	xil_printf("sw es 2\r");
-            Xil_Out32(MY_PWM, 0);
-            Xil_Out32(MY_PWM + 4, 4 * 255);
-            Xil_Out32(MY_PWM + 8, 0);
-            break;
-        case 3:
-            Xil_Out32(MY_PWM, 4 * 255);
-            Xil_Out32(MY_PWM + 4, 4 * 255);
-            Xil_Out32(MY_PWM + 8, 0);
-            break;
-        case 4:
-            Xil_Out32(MY_PWM, 0);
-            Xil_Out32(MY_PWM + 4, 0);
-            Xil_Out32(MY_PWM + 8, 4 * 255);
-            break;
-        case 5:
-            Xil_Out32(MY_PWM, 4 * 255);
-            Xil_Out32(MY_PWM + 4, 0);
-            Xil_Out32(MY_PWM + 8, 4 * 255);
-            break;
-        case 6:
-            Xil_Out32(MY_PWM, 0);
-            Xil_Out32(MY_PWM + 4, 4 * 255);
-            Xil_Out32(MY_PWM + 8, 4 * 255);
             break;
 
-        case 7:
-            Xil_Out32(MY_PWM, 4 * 255);
-            Xil_Out32(MY_PWM + 4, 4 * 255);
-            Xil_Out32(MY_PWM + 8, 4 * 255);
+        case 2: // Grabar la canción
+            switch (sw_value)
+            {
+            case 0:
+                Xil_Out32(MY_PWM, 0);
+                Xil_Out32(MY_PWM + 4, 0);
+                Xil_Out32(MY_PWM + 8, 0);
+                break;
+            case 1:
+                Xil_Out32(MY_PWM, 4 * 255);
+                Xil_Out32(MY_PWM + 4, 0);
+                Xil_Out32(MY_PWM + 8, 0);
+                break;
+            case 2:
+                xil_printf("sw es 2\r");
+                Xil_Out32(MY_PWM, 0);
+                Xil_Out32(MY_PWM + 4, 4 * 255);
+                Xil_Out32(MY_PWM + 8, 0);
+                break;
+            case 3:
+                Xil_Out32(MY_PWM, 4 * 255);
+                Xil_Out32(MY_PWM + 4, 4 * 255);
+                Xil_Out32(MY_PWM + 8, 0);
+                break;
+            case 4:
+                Xil_Out32(MY_PWM, 0);
+                Xil_Out32(MY_PWM + 4, 0);
+                Xil_Out32(MY_PWM + 8, 4 * 255);
+                break;
+            case 5:
+                Xil_Out32(MY_PWM, 4 * 255);
+                Xil_Out32(MY_PWM + 4, 0);
+                Xil_Out32(MY_PWM + 8, 4 * 255);
+                break;
+            case 6:
+                Xil_Out32(MY_PWM, 0);
+                Xil_Out32(MY_PWM + 4, 4 * 255);
+                Xil_Out32(MY_PWM + 8, 4 * 255);
+                break;
+
+            case 7:
+                Xil_Out32(MY_PWM, 4 * 255);
+                Xil_Out32(MY_PWM + 4, 4 * 255);
+                Xil_Out32(MY_PWM + 8, 4 * 255);
+                break;
+            default:
+                Xil_Out32(MY_PWM, 0);
+                Xil_Out32(MY_PWM + 4, 0);
+                Xil_Out32(MY_PWM + 8, 0);
+                break;
+            }
             break;
+
+        case 3: // Reproducir canción
+
+            break;
+
         default:
-            Xil_Out32(MY_PWM, 0);
-            Xil_Out32(MY_PWM + 4, 0);
-            Xil_Out32(MY_PWM + 8, 0);
+            flag = 0;
             break;
         }
-
-        break;
-
-    case 2: // Grabar la canción
-
-        break;
-
-    case 3: // Reproducir canción
-
-        break;
-
-    default:
-        flag = 0;
-        break;
-    }
     }
     cleanup_platform();
 }
