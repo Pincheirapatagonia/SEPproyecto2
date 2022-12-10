@@ -72,7 +72,7 @@ static int sw_value;
 static int tmr_count;
 static int led_value;
 static int btn_value;
-
+int aux = 0;
 //------Structs--------
 
 struct canciones
@@ -82,20 +82,13 @@ struct canciones
     short unsigned int id;
     short unsigned int usado;
 };
-// static void TMR_Intr_Handler(void *baseaddr_p);
-// handler (manipulador) de la interrupcion del timer
-static void TMR_Intr_Handler(void *baseaddr_p); //(en ayudantias)
-
-static void SW_Intr_Handler(void *baseaddr_p);
-
-//----------- Controladores de las interrupciones ----------
-// relacionado al timer (TMR)
-
-static int IntcInitFunction(u16 DeviceId, XTmrCtr *TmrInstancePtr); //(en ayudantias)
+//----------- Instanciaciones funciones propias ----------
 
 void delay_ds(int delay);
+void print_menu(void);
+void flashear(void);
 
-int aux = 0;
+//----------- Handlers ----------
 
 static void TMR_Intr_Handler(void *baseaddr_p); //(en ayudantias)
 static void BTN_Intr_Handler(void *baseaddr_p); //(en ayudantias)
@@ -112,17 +105,21 @@ static int IntcInitFunction2(u16 DeviceId, XGpio *GpioInstancePtr); //(en ayudan
 static int InterruptSystemSetup3(XScuGic *XScuGicInstancePtr);
 static int IntcInitFunction3(u16 DeviceId, XGpio *GpioInstancePtr);
 
+//-----------Inicio MAIN ----------
 int main()
 {
 
     init_platform();
     struct canciones cancion[4], *ptr;
 
+    //flashear();
+
     ptr = &cancion[0];
     int flag=0;
     char name[50];
 
-    xil_printf("Iniciando...");
+    xil_printf("Iniciando...\r"); //Si imprime
+    xil_printf("entra a switch\r");
     switch (flag)
     {
     case 0: // Menu
@@ -132,7 +129,7 @@ int main()
         if (btn_value != 0)
         {
             ptr = &cancion[sw_value];
-            xil_printf("Ingrese nombre de la cancion");
+            xil_printf("Ingrese nombre de la cancion: ");
             scanf("%s", name);
             strncpy((ptr->nombre), name, 50);
             (ptr->id) = sw_value;
@@ -158,7 +155,8 @@ int main()
     }
 }
 
-// Fin del main
+//-----------Fin MAIN ----------
+
 void delay_ds(int delay)
 {
     int contador_t;
@@ -167,15 +165,16 @@ void delay_ds(int delay)
     {
         xil_printf(" ");
     }
+    xil_printf("\r");
     // tmr_count = 0;
 }
-void print_menu()
+void print_menu(void)
 {
-    xil_printf("Ingresando a flag 0");
+    xil_printf("Ingresando a flag 0 \r");
 }
 void flashear(void)
 {
-
+	xil_printf("flasheando \r");
     XGpio_DiscreteWrite(&LEDInst, 1, 15);
     delay_ds(5);
     XGpio_DiscreteWrite(&LEDInst, 1, 0);
