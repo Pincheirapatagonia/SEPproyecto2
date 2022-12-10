@@ -142,6 +142,57 @@ int main()
 
     case 1: // Ingresar nombre e ID de la canción
 
+        xil_printf("Entrandso a case 1");
+        switch (sw_value)
+        {
+        case 0:
+            Xil_Out32(MY_PWM, 0);
+            Xil_Out32(MY_PWM + 4, 0);
+            Xil_Out32(MY_PWM + 8, 0);
+            break;
+        case 1:
+            Xil_Out32(MY_PWM, 4 * 255);
+            Xil_Out32(MY_PWM + 4, 0);
+            Xil_Out32(MY_PWM + 8, 0);
+            break;
+        case 2:
+            Xil_Out32(MY_PWM, 0);
+            Xil_Out32(MY_PWM + 4, 4 * 255);
+            Xil_Out32(MY_PWM + 8, 0);
+            break;
+        case 3:
+            Xil_Out32(MY_PWM, 4 * 255);
+            Xil_Out32(MY_PWM + 4, 4 * 255);
+            Xil_Out32(MY_PWM + 8, 0);
+            break;
+        case 4:
+            Xil_Out32(MY_PWM, 0);
+            Xil_Out32(MY_PWM + 4, 0);
+            Xil_Out32(MY_PWM + 8, 4 * 255);
+            break;
+        case 5:
+            Xil_Out32(MY_PWM, 4 * 255);
+            Xil_Out32(MY_PWM + 4, 0);
+            Xil_Out32(MY_PWM + 8, 4 * 255);
+            break;
+        case 6:
+            Xil_Out32(MY_PWM, 0);
+            Xil_Out32(MY_PWM + 4, 4 * 255);
+            Xil_Out32(MY_PWM + 8, 4 * 255);
+            break;
+
+        case 7:
+            Xil_Out32(MY_PWM, 4 * 255);
+            Xil_Out32(MY_PWM + 4, 4 * 255);
+            Xil_Out32(MY_PWM + 8, 4 * 255);
+            break;
+        default:
+            Xil_Out32(MY_PWM, 0);
+            Xil_Out32(MY_PWM + 4, 0);
+            Xil_Out32(MY_PWM + 8, 0);
+            break;
+        }
+
         break;
     case 2: // Grabar la canción
 
