@@ -183,7 +183,7 @@ int main()
 
     struct canciones cancion[4], *ptr;
     ptr = &cancion[0];
-    int flag = 1;
+    int flag = 0;
     char name[50];
     xil_printf("7Iniciando antes...\r"); //Si imprime
 
@@ -195,7 +195,7 @@ int main()
         flashear();
         print_menu();
 
-        if (btn_value != 0)
+        if (btn_value > 0)
         {
             ptr = &cancion[sw_value];
             xil_printf("Ingrese nombre de la cancion: ");
@@ -209,7 +209,7 @@ int main()
         }
         break;
 
-    case 1: // Ingresar nombre e ID de la canción
+    case 1: // Ingresar nombre e ID de la canciÃ³n
 
         xil_printf("Entrando a case 1\r");
         //no estra a este switch
@@ -266,11 +266,11 @@ int main()
 
         break;
 
-    case 2: // Grabar la canción
+    case 2: // Grabar la canciÃ³n
 
         break;
 
-    case 3: // Reproducir canción
+    case 3: // Reproducir canciÃ³n
 
         break;
 
@@ -335,11 +335,12 @@ void BTN_Intr_Handler(void *InstancePtr)
         return;
     }
     btn_value = XGpio_DiscreteRead(&BTNInst, 1);
-        //se activa solo cuando se presiona, no cuando se suelta el boton
-        btn_press = 0;
-        if(btn_value != 0){
-        	btn_press = 1;
-        }
+    //se activa solo cuando se presiona, no cuando se suelta el boton
+    btn_press = 0;
+    if(btn_value != 0){
+       	btn_press = 1;
+    };
+    XGpio_DiscreteWrite(&LEDInst, 1, btn_value);
 
     xil_printf("ha cambiado el btn \r");
     xil_printf("val btn %d \r",btn_value);
