@@ -189,6 +189,8 @@ int main()
 
     xil_printf("Iniciando...\r"); //Si imprime
     xil_printf("Entra a switch\r");
+
+    while(1){
     switch (flag)
     {
     case 0: // Menu
@@ -278,7 +280,7 @@ int main()
         flag = 0;
         break;
     }
-
+    }
     cleanup_platform();
 }
 
