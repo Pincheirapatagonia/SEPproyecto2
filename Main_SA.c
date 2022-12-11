@@ -15,12 +15,9 @@
 #include "sleep.h"
 #include "sdCard.h"
 
-
 #include "xdebug.h"
 
-
 #include <string.h>
-
 
 //------- SD param--------
 
@@ -128,7 +125,6 @@ int main()
     init_platform();
     int Status;
 
-   
     int status;
     //----------------------------------------------------
     // INITIALIZE THE PERIPHERALS & SET DIRECTIONS OF GPIO
@@ -232,6 +228,7 @@ int main()
             break;
 
         case 2: // Grabar la canción
+            xil_printf("Entrando a caso 2\r");
             switch (flag2)
             {
             case 0:
@@ -324,7 +321,7 @@ int main()
             break;
 
         case 3: // Reproducir canción
-           xil_printf("Caso 3");
+            xil_printf("Caso 3");
             break;
 
         case 4:
@@ -354,7 +351,7 @@ void delay_ds(int delay)
 }
 void print_menu(void)
 {
-    xil_printf("--------------------------\r Menu: Utilice los sw para seleccinar una opción\r 1) Ingresar una nueva canción\r 2) RGB demo\r 3) Audio demo\r 4) SD demo\r --------------------------\r");
+    xil_printf("--------------------------\r Menu: Utilice los sw para seleccionar una opción\r 1) Ingresar una nueva canción\r 2) RGB demo\r 3) Audio demo\r 4) SD demo\r --------------------------\r");
 }
 void flashear(void)
 {
@@ -400,7 +397,7 @@ void BTN_Intr_Handler(void *InstancePtr)
     };
     XGpio_DiscreteWrite(&LEDInst, 1, btn_value);
 
-    xil_printf("ha cambiado el btn \r");
+    xil_printf("\r ha cambiado el btn \r");
     xil_printf("val btn %d \r", btn_value);
     (void)XGpio_InterruptClear(&BTNInst, BTN_INT);
     // Enable GPIO interrupts
@@ -419,7 +416,7 @@ void SW_Intr_Handler(void *InstancePtr)
     }
 
     sw_value = XGpio_DiscreteRead(&SWInst, 1);
-    xil_printf("ha cambiado el switch\r");
+    xil_printf("\r ha cambiado el switch\r");
     xil_printf("val switch %d \r", sw_value);
 
     (void)XGpio_InterruptClear(&SWInst, SW_INT);
@@ -431,7 +428,6 @@ void SW_Intr_Handler(void *InstancePtr)
 
 int InterruptSystemSetup(XScuGic *XScuGicInstancePtr)
 {
-    xil_printf("100Iniciando antes...\r"); // Si imprime
     Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
                                  (Xil_ExceptionHandler)XScuGic_InterruptHandler,
                                  XScuGicInstancePtr);
@@ -471,20 +467,16 @@ int IntcInitFunction(u16 DeviceId, XTmrCtr *TmrInstancePtr)
 {
     XScuGic_Config *IntcConfig;
     int status;
-    xil_printf("90Iniciando antes...\r"); // Si imprime
     // Interrupt controller initialization
     // le asigna la configuracion que encontro  del device (lookup) del device
     IntcConfig = XScuGic_LookupConfig(DeviceId);
-    xil_printf("91Iniciando antes...\r");                                              // Si imprime
     status = XScuGic_CfgInitialize(&INTCInst, IntcConfig, IntcConfig->CpuBaseAddress); // lo inicializa
     if (status != XST_SUCCESS)
         return XST_FAILURE;
-    xil_printf("92Iniciando antes...\r"); // Si imprime
     // Call to interrupt setup, llama a la funcion InterruptSystemSetup que definimos en este codigo
     status = InterruptSystemSetup(&INTCInst);
     if (status != XST_SUCCESS)
         return XST_FAILURE;
-    xil_printf("93Iniciando antes...\r"); // Si imprime
     // Connect timer interrupt to handler
     status = XScuGic_Connect(&INTCInst, INTC_TMR_INTERRUPT_ID,
                              (Xil_ExceptionHandler)TMR_Intr_Handler,
