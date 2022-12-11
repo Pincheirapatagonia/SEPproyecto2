@@ -204,6 +204,7 @@ int main()
             flashear();
             if (btn_value!=0){
                 flag = sw_value;
+                xil_printf("\r Ingresando al caso %d \r", flag);
             }
             
             break;
@@ -245,9 +246,9 @@ int main()
                 Xil_Out32(MY_PWM, 4 * num);
                 Xil_Out32(MY_PWM + 4, 0);
                 Xil_Out32(MY_PWM + 8, 0);
-                num = num +10;
-                delay_ds(1);
-                if (num > 240)
+                num = num +25;
+                delay_ds(2);
+                if (num > 230)
                 {
                     flag2++;
                 }
@@ -256,9 +257,9 @@ int main()
                 Xil_Out32(MY_PWM, 4 * num);
                 Xil_Out32(MY_PWM + 4, 4 * num);
                 Xil_Out32(MY_PWM + 8, 0);
-                num=num-10;
-                delay_ds(1);
-                if (num <= 15)
+                num=num-25;
+                delay_ds(2);
+                if (num <= 25)
                 {
                     flag2++;
                 }
@@ -268,9 +269,9 @@ int main()
                 Xil_Out32(MY_PWM, 0);
                 Xil_Out32(MY_PWM + 4, 4 * num);
                 Xil_Out32(MY_PWM + 8, 0);
-                num = num +10;
-                delay_ds(1);
-                if (num > 240)
+                num = num +25;
+                delay_ds(2);
+                if (num > 230)
                 {
                     flag2++;
                 }
@@ -279,9 +280,9 @@ int main()
                 Xil_Out32(MY_PWM, 0);
                 Xil_Out32(MY_PWM + 4, 4 * num);
                 Xil_Out32(MY_PWM + 8, 4 * num);
-                num=num-10;
-                delay_ds(1);
-                if (num <= 15)
+                num=num-25;
+                delay_ds(2);
+                if (num <= 25)
                 {
                     flag2++;
                 }
@@ -290,9 +291,9 @@ int main()
                 Xil_Out32(MY_PWM, 0);
                 Xil_Out32(MY_PWM + 4, 0);
                 Xil_Out32(MY_PWM + 8, 4 * num);
-                num = num +10;
-                delay_ds(1);
-                if (num > 240)
+                num = num +25;
+                delay_ds(2);
+                if (num > 230)
                 {
                     flag2++;
                 }
@@ -301,9 +302,9 @@ int main()
                 Xil_Out32(MY_PWM, 4 * num);
                 Xil_Out32(MY_PWM + 4, 0);
                 Xil_Out32(MY_PWM + 8, 4 * num);
-                num=num-10;
-                delay_ds(1);
-                if (num <= 15)
+                num=num-25;
+                delay_ds(2);
+                if (num <= 25)
                 {
                     flag2++;
                 }
@@ -312,10 +313,13 @@ int main()
                 Xil_Out32(MY_PWM, 4 * num);
                 Xil_Out32(MY_PWM + 4, 4 * num);
                 Xil_Out32(MY_PWM + 8, 4 * num);
-                num = num +10;
-                delay_ds(1);
-                if (num > 240)
+                num = num +25;
+                delay_ds(2);
+                if (num > 230)
                 {
+                    Xil_Out32(MY_PWM, 0);
+                    Xil_Out32(MY_PWM + 4, 0);
+                    Xil_Out32(MY_PWM + 8, 0);
                     flag2 = 0;
                     flag = 0;
                 }
