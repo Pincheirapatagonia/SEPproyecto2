@@ -406,8 +406,7 @@ void BTN_Intr_Handler(void *InstancePtr)
     };
     XGpio_DiscreteWrite(&LEDInst, 1, btn_value);
 
-    xil_printf("\r ha cambiado el btn \r");
-    xil_printf("val btn %d \r", btn_value);
+   
     (void)XGpio_InterruptClear(&BTNInst, BTN_INT);
     // Enable GPIO interrupts
     XGpio_InterruptEnable(&BTNInst, BTN_INT);
@@ -425,8 +424,7 @@ void SW_Intr_Handler(void *InstancePtr)
     }
 
     sw_value = XGpio_DiscreteRead(&SWInst, 1);
-    xil_printf("\r ha cambiado el switch\r");
-    xil_printf("val switch %d \r", sw_value);
+   
 
     (void)XGpio_InterruptClear(&SWInst, SW_INT);
     // Enable GPIO interrupts
