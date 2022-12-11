@@ -38,7 +38,7 @@ char *dataPntr = dataBuffer;
 XSysMon SysMonInst;          /* System Monitor driver instance */
 XScuGic InterruptController; /* Instance of the XIntc driver. */
 
-#define MY_PWM 0x43C10000 // This value is found in the Address editor tab in Vivado (next to Diagram tab)
+#define MY_PWM 0x40004000 // This value is found in the Address editor tab in Vivado (next to Diagram tab)
 
 //------ GPIO Parameter definitions --------
 
@@ -202,20 +202,20 @@ int main()
             break;
         case 5:
             flashear();
-            if (sw_value!=0){
+            if (btn_value!=0){
                 flag = sw_value;
             }
             
             break;
         case 1: // Ingresar nombre e ID de la canción
 
-            xil_printf("Para elegir la canción seleccione con el switch y presione un boton para confirmar\r");
+            xil_printf("\rPara elegir la canción seleccione con el switch y presione un boton para confirmar\r");
 
             flag = 6;
 
             break;
         case 6:
-            xil_printf
+            
             if (btn_value > 0)
             {
                 ptr = &cancion[sw_value];
@@ -223,20 +223,21 @@ int main()
             }
 
             if (go > 0)
-            {   
-                xil_printf("Ingrese nombre de la cancion: ");
+            {
+                xil_printf("\rIngrese nombre de la cancion: \r");
                 scanf("%s", name);
                 strncpy((ptr->nombre), name, 50);
                 (ptr->id) = sw_value;
                 (ptr->usado) = 1;
                 strcat(name, ".txt");
                 strncpy((ptr->target), name, 50);
-                xil_printf("name is %s, saved in %s \n", (ptr->nombre), (ptr->target));
+                openFile((ptr->target), "w");
+                xil_printf("\r name is %s, saved in %s \r", (ptr->nombre), (ptr->target));
                 flag = 0;
             }
             break;
         case 2: // RGB
-            xil_printf("Entrando a caso 2\r");
+            
             switch (flag2)
             {
             case 0:
@@ -244,9 +245,9 @@ int main()
                 Xil_Out32(MY_PWM, 4 * num);
                 Xil_Out32(MY_PWM + 4, 0);
                 Xil_Out32(MY_PWM + 8, 0);
-                num++;
+                num = num +10;
                 delay_ds(1);
-                if (num > 254)
+                if (num > 240)
                 {
                     flag2++;
                 }
@@ -255,9 +256,9 @@ int main()
                 Xil_Out32(MY_PWM, 4 * num);
                 Xil_Out32(MY_PWM + 4, 4 * num);
                 Xil_Out32(MY_PWM + 8, 0);
-                num--;
+                num=num-10;
                 delay_ds(1);
-                if (num <= 0)
+                if (num <= 15)
                 {
                     flag2++;
                 }
@@ -267,9 +268,9 @@ int main()
                 Xil_Out32(MY_PWM, 0);
                 Xil_Out32(MY_PWM + 4, 4 * num);
                 Xil_Out32(MY_PWM + 8, 0);
-                num++;
+                num = num +10;
                 delay_ds(1);
-                if (num > 254)
+                if (num > 240)
                 {
                     flag2++;
                 }
@@ -278,9 +279,9 @@ int main()
                 Xil_Out32(MY_PWM, 0);
                 Xil_Out32(MY_PWM + 4, 4 * num);
                 Xil_Out32(MY_PWM + 8, 4 * num);
-                num--;
+                num=num-10;
                 delay_ds(1);
-                if (num <= 0)
+                if (num <= 15)
                 {
                     flag2++;
                 }
@@ -289,9 +290,9 @@ int main()
                 Xil_Out32(MY_PWM, 0);
                 Xil_Out32(MY_PWM + 4, 0);
                 Xil_Out32(MY_PWM + 8, 4 * num);
-                num++;
+                num = num +10;
                 delay_ds(1);
-                if (num > 254)
+                if (num > 240)
                 {
                     flag2++;
                 }
@@ -300,9 +301,9 @@ int main()
                 Xil_Out32(MY_PWM, 4 * num);
                 Xil_Out32(MY_PWM + 4, 0);
                 Xil_Out32(MY_PWM + 8, 4 * num);
-                num--;
+                num=num-10;
                 delay_ds(1);
-                if (num <= 0)
+                if (num <= 15)
                 {
                     flag2++;
                 }
@@ -311,9 +312,9 @@ int main()
                 Xil_Out32(MY_PWM, 4 * num);
                 Xil_Out32(MY_PWM + 4, 4 * num);
                 Xil_Out32(MY_PWM + 8, 4 * num);
-                num++;
+                num = num +10;
                 delay_ds(1);
-                if (num > 254)
+                if (num > 240)
                 {
                     flag2 = 0;
                     flag = 0;
@@ -355,16 +356,16 @@ void delay_ds(int delay)
     {
         xil_printf(" ");
     }
-    xil_printf("\r");
-    // tmr_count = 0;
+    //xil_printf("\r");
+    
 }
 void print_menu(void)
 {
-    xil_printf("--------------------------\r Menu: Utilice los sw para seleccionar una opción\r 1) Ingresar una nueva canción\r 2) RGB demo\r 3) Audio demo\r 4) SD demo\r --------------------------\r");
+    xil_printf("\r--------------------------\r Menu: Utilice los sw para seleccionar una opción\r 1) Ingresar una nueva canción\r 2) RGB demo\r 3) Audio demo\r 4) SD demo\r --------------------------\r");
 }
 void flashear(void)
 {
-    xil_printf("flasheando \r");
+    
     XGpio_DiscreteWrite(&LEDInst, 1, 15);
     delay_ds(5);
     XGpio_DiscreteWrite(&LEDInst, 1, 0);
