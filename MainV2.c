@@ -619,7 +619,7 @@ int main()
             break;
             
         case 4:
-
+            xil_printf("Creando archivo")
             break;
 
         default:
