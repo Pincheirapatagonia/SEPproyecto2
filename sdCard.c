@@ -75,7 +75,7 @@ FIL* openFile(char *FileName,char mode){
 		}
 	}
 	else if(mode == 'a'){
-		rc = f_open(&fil, (char *)FileName, FA_OPEN_ALWAYS | FA_WRITE); //f_open
+		rc = f_open(&fil, (char *)FileName, FA_OPEN_APPEND | FA_WRITE); //f_open
 		if(rc != FR_OK){ //file doesn't exists
 			rc = f_open(&fil, (char *)FileName, FA_CREATE_NEW | FA_WRITE); //f_open
 		}
@@ -100,5 +100,3 @@ int writeFile(FIL* fptr, u32 size, u32 SourceAddress){
 	}
 	return btw;
 }
-
-
