@@ -296,7 +296,7 @@ int main()
     status = XGpio_Initialize(&SWInst, SWS_DEVICE_ID);
     if (status != XST_SUCCESS)
         return XST_FAILURE;
-    xil_printf("2Iniciando antes...\r"); //Si imprime
+    
 
     // Set LEDs direction to outputs
     // setea los leds como outputs (ceros), si fueran 1 serian entradas
@@ -308,7 +308,7 @@ int main()
 
     // Set all switches direction to inputs
     XGpio_SetDataDirection(&SWInst, 1, 0xFF);
-    xil_printf("3Iniciando antes...\r"); //Si imprime
+    
 
     //----------------------------------------------------
     // SETUP THE TIMER
@@ -320,13 +320,13 @@ int main()
     // el valor de reset es del cual empieza a contar hasta los 32 bits a una frecuencia de 50MHz
     XTmrCtr_SetResetValue(&TMRInst, 0, TMR_LOAD);                                  // setea el valor del reset llamado TMR_LOAD
     XTmrCtr_SetOptions(&TMRInst, 0, XTC_INT_MODE_OPTION | XTC_AUTO_RELOAD_OPTION); // setea opciones
-    xil_printf("4Iniciando antes...\r"); //Si imprime
+    
     // Initialize interrupt controller (controlador de interrupciones)
     status = IntcInitFunction(INTC_DEVICE_ID, &TMRInst);
     if (status != XST_SUCCESS)
         return XST_FAILURE;
     XTmrCtr_Start(&TMRInst, 0);
-    xil_printf("5Iniciando antes...\r"); //Si imprime
+    
 
     // Initialize interrupt controller del boton
     status = IntcInitFunction2(INTC_DEVICE_ID, &BTNInst);
@@ -336,7 +336,7 @@ int main()
     status = IntcInitFunction3(INTC_DEVICE_ID, &SWInst);
     if (status != XST_SUCCESS)
         return XST_FAILURE;
-    xil_printf("6Iniciando antes...\r"); //Si imprime
+    
     // Creamos estructura de canciones
 
     struct canciones cancion[4], *ptr;
@@ -344,10 +344,8 @@ int main()
     int flag = 0;
     char name[50];
     int go =0;
-    xil_printf("7Iniciando antes...\r"); //Si imprime
-
-    xil_printf("Iniciando...\r"); //Si imprime
-    xil_printf("Entra a switch\r");
+    
+    
 
     while(1){
     switch (flag)
@@ -364,7 +362,7 @@ int main()
     case 1: // Ingresar nombre e ID de la canción
 
         xil_printf("Entrando a case 1\r");
-        xil_printf("Cambie el switch a al n\r");
+       
         if (btn_value>0)
         {
             ptr = &cancion[sw_value];
@@ -577,6 +575,10 @@ int main()
                 Demo.chBtn = 0;
                 Demo.fUserIOEvent = 0;
             }
+            break;
+            
+        case 4:
+
             break;
 
         default:
