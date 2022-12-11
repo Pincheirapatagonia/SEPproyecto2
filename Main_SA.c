@@ -202,7 +202,10 @@ int main()
             break;
         case 5:
             flashear();
-            flag = sw_value;
+            if (sw_value!=0){
+                flag = sw_value;
+            }
+            
             break;
         case 1: // Ingresar nombre e ID de la canción
 
