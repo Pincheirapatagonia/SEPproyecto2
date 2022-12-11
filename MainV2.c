@@ -645,7 +645,7 @@ void delay_ds(int delay)
 }
 void print_menu(void)
 {
-    xil_printf("Ingresando a flag 0 \r");
+    xil_printf("--------------------------\r Menu: Utilice los sw para seleccinar una opción\r 1) Ingresar una nueva canción\r 2) RGB demo\r 3) Audio demo\r 4) SD demo\r --------------------------\r");
 }
 void flashear(void)
 {
