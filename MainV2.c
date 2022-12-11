@@ -162,7 +162,6 @@ static int led_value;
 static int btn_value;
 static int sw_value;
 static int tmr_count;
-static int btn_data;
 static int btn_press = 0;
 
 int aux = 0;
@@ -342,6 +341,8 @@ int main()
     struct canciones cancion[4], *ptr;
     ptr = &cancion[0];
     int flag = 0;
+    int flag2 = 0;
+    int num = 0;
     char name[50];
     int go =0;
     
@@ -361,7 +362,7 @@ int main()
 
     case 1: // Ingresar nombre e ID de la canción
 
-        xil_printf("Entrando a case 1\r");
+        xil_printf("Para elegir la canción seleccione con el switch y presione un boton para confirmar\r");
        
         if (btn_value>0)
         {
@@ -385,50 +386,90 @@ int main()
             break;
 
         case 2: // Grabar la canción
-            switch (sw_value)
+            switch (flag2)
             {
             case 0:
-                Xil_Out32(MY_PWM, 0);
+
+                Xil_Out32(MY_PWM, 4*num);
                 Xil_Out32(MY_PWM + 4, 0);
                 Xil_Out32(MY_PWM + 8, 0);
+                num++;
+                delay_ds(1);
+                if (num>254){
+                    flag2++;
+
+                }
                 break;
             case 1:
-                Xil_Out32(MY_PWM, 4 * 255);
-                Xil_Out32(MY_PWM + 4, 0);
+                Xil_Out32(MY_PWM, 4 * num);
+                Xil_Out32(MY_PWM + 4, 4*num);
                 Xil_Out32(MY_PWM + 8, 0);
+                num--;
+                delay_ds(1);
+                if (num <= 0)
+                {
+                    flag2++;
+                }
                 break;
             case 2:
-                xil_printf("sw es 2\r");
+                
                 Xil_Out32(MY_PWM, 0);
-                Xil_Out32(MY_PWM + 4, 4 * 255);
+                Xil_Out32(MY_PWM + 4, 4 * num);
                 Xil_Out32(MY_PWM + 8, 0);
+                num++;
+                delay_ds(1);
+                if (num > 254)
+                {
+                    flag2++;
+                }
                 break;
             case 3:
-                Xil_Out32(MY_PWM, 4 * 255);
-                Xil_Out32(MY_PWM + 4, 4 * 255);
-                Xil_Out32(MY_PWM + 8, 0);
+                Xil_Out32(MY_PWM, 0);
+                Xil_Out32(MY_PWM + 4, 4 * num);
+                Xil_Out32(MY_PWM + 8, 4 * num);
+                num--;
+                delay_ds(1);
+                if (num <= 0)
+                {
+                    flag2++;
+                }
                 break;
             case 4:
                 Xil_Out32(MY_PWM, 0);
                 Xil_Out32(MY_PWM + 4, 0);
-                Xil_Out32(MY_PWM + 8, 4 * 255);
+                Xil_Out32(MY_PWM + 8, 4 * num);
+                num++;
+                delay_ds(1);
+                if (num > 254)
+                {
+                    flag2++;
+                }
                 break;
             case 5:
-                Xil_Out32(MY_PWM, 4 * 255);
+                Xil_Out32(MY_PWM, 4 * num);
                 Xil_Out32(MY_PWM + 4, 0);
-                Xil_Out32(MY_PWM + 8, 4 * 255);
+                Xil_Out32(MY_PWM + 8, 4 * num);
+                num--;
+                delay_ds(1);
+                if (num <= 0)
+                {
+                    flag2++;
+                }
                 break;
             case 6:
-                Xil_Out32(MY_PWM, 0);
-                Xil_Out32(MY_PWM + 4, 4 * 255);
-                Xil_Out32(MY_PWM + 8, 4 * 255);
+                Xil_Out32(MY_PWM, 4 * num);
+                Xil_Out32(MY_PWM + 4, 4 * num);
+                Xil_Out32(MY_PWM + 8, 4 * num);
+                num++;
+                delay_ds(1);
+                if (num > 254)
+                {
+                    flag2=0;
+                    flag=0;
+                }
                 break;
 
-            case 7:
-                Xil_Out32(MY_PWM, 4 * 255);
-                Xil_Out32(MY_PWM + 4, 4 * 255);
-                Xil_Out32(MY_PWM + 8, 4 * 255);
-                break;
+            
             default:
                 Xil_Out32(MY_PWM, 0);
                 Xil_Out32(MY_PWM + 4, 0);
