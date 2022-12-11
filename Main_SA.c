@@ -38,7 +38,7 @@ char *dataPntr = dataBuffer;
 XSysMon SysMonInst;          /* System Monitor driver instance */
 XScuGic InterruptController; /* Instance of the XIntc driver. */
 
-#define MY_PWM 0x40004000 // This value is found in the Address editor tab in Vivado (next to Diagram tab)
+#define MY_PWM 0x43C10000 // This value is found in the Address editor tab in Vivado (next to Diagram tab)
 
 //------ GPIO Parameter definitions --------
 
@@ -215,6 +215,7 @@ int main()
 
             break;
         case 6:
+            xil_printf
             if (btn_value > 0)
             {
                 ptr = &cancion[sw_value];
@@ -222,7 +223,7 @@ int main()
             }
 
             if (go > 0)
-            {
+            {   
                 xil_printf("Ingrese nombre de la cancion: ");
                 scanf("%s", name);
                 strncpy((ptr->nombre), name, 50);
@@ -352,9 +353,9 @@ void delay_ds(int delay)
     contador_t = tmr_count;
     while (tmr_count < contador_t + delay)
     {
-        aux = 1;
+        xil_printf(" ");
     }
-
+    xil_printf("\r");
     // tmr_count = 0;
 }
 void print_menu(void)
