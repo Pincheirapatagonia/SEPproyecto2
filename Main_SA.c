@@ -194,18 +194,24 @@ int main()
         switch (flag)
         {
         case 0: // Menu
-            flashear();
+
             print_menu();
             go = 0;
-
-            flag = sw_value;
+            flag = 5;
 
             break;
-
+        case 5:
+            flashear();
+            flag = sw_value;
+            break;
         case 1: // Ingresar nombre e ID de la canción
 
             xil_printf("Para elegir la canción seleccione con el switch y presione un boton para confirmar\r");
 
+            flag = 6;
+
+            break;
+        case 6:
             if (btn_value > 0)
             {
                 ptr = &cancion[sw_value];
@@ -224,10 +230,8 @@ int main()
                 xil_printf("name is %s, saved in %s \n", (ptr->nombre), (ptr->target));
                 flag = 0;
             }
-
             break;
-
-        case 2: // Grabar la canción
+        case 2: // RGB
             xil_printf("Entrando a caso 2\r");
             switch (flag2)
             {
@@ -341,12 +345,13 @@ int main()
 void delay_ds(int delay)
 {
     int contador_t;
+    int aux;
     contador_t = tmr_count;
     while (tmr_count < contador_t + delay)
     {
-        xil_printf(" ");
+        aux = 1;
     }
-    xil_printf("\r");
+
     // tmr_count = 0;
 }
 void print_menu(void)
