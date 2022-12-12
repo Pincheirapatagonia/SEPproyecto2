@@ -191,7 +191,10 @@ int main()
     int num = 0;
     char name[50];
     int go = 0;
-
+    char *target;
+    char dataBuffer[1024];
+    char *dataPntr = dataBuffer;
+    char TempData[50];
     while (1)
     {
         switch (flag)
@@ -236,7 +239,7 @@ int main()
                 (ptr->usado) = 1;
                 strcat(name, ".txt");
                 strncpy((ptr->target), name, 50);
-                fptr = openFile((ptr->target), "a");
+                fptr = openFile((ptr->target), 'a');
                 fprintf(fptr, "%s", "This is tutorialspoint.com");
 
                 if (fptr == 0)
@@ -244,8 +247,7 @@ int main()
                 
                 xil_printf("\r name is %s, saved in %s \r", (ptr->nombre), (ptr->target));
                 closeFile(fptr);
-                SD_Eject();
-                xil_printf("Safe to remove SD Card...\n\r");
+                
                 flag = 0;
             }
             break;
@@ -346,7 +348,30 @@ int main()
             break;
 
         case 3: // Reproducir canción
-            xil_printf("Caso 3");
+            
+            logNum++;
+            TempData = "Holaaaa";
+            sprintf(dataPntr, "%s\n", TempData);
+            dataPntr = dataPntr + 8;
+            if (logNum % 10 == 0)
+            {
+                xil_printf("\rUpdating SD card...\n\r");
+                writeFile(fptr, 80, (u32)dataBuffer);
+                dataPntr = (char *)dataBuffer;
+            }
+
+            if (logNum == MAX_LOG_NUM)
+            {
+                closeFile(fptr);
+                SD_Eject();
+                xil_printf("\rSafe to remove SD Card...\n\r");
+                
+            }
+            else
+            {
+                delay_ds(1);
+                
+            }
             break;
 
         case 4:
