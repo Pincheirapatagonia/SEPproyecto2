@@ -124,7 +124,10 @@ int main()
 {
     init_platform();
     int Status;
+    Status = SD_Init();
 
+    if (Status != XST_SUCCESS)
+        xil_printf("SD card init failed");
     int status;
     //----------------------------------------------------
     // INITIALIZE THE PERIPHERALS & SET DIRECTIONS OF GPIO
@@ -225,6 +228,7 @@ int main()
 
             if (go > 0)
             {
+                
                 xil_printf("\rIngrese nombre de la cancion: \r");
                 scanf("%s", name);
                 strncpy((ptr->nombre), name, 50);
@@ -232,8 +236,15 @@ int main()
                 (ptr->usado) = 1;
                 strcat(name, ".txt");
                 strncpy((ptr->target), name, 50);
-                openFile((ptr->target), "w");
+                fptr = openFile((ptr->target), "w");
+
+                if (fptr == 0)
+                    printf("File opening failed\n\r");
+                
                 xil_printf("\r name is %s, saved in %s \r", (ptr->nombre), (ptr->target));
+                closeFile(fptr);
+                SD_Eject();
+                xil_printf("Safe to remove SD Card...\n\r")
                 flag = 0;
             }
             break;
