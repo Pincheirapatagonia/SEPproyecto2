@@ -348,15 +348,29 @@ int main()
             break;
 
         case 3: // Reproducir canción
-            
+            ptr = &cancion[2];
+            name[50] = "caso_3";
+            strncpy((ptr->nombre), name, 50);
+            (ptr->id) = sw_value;
+            (ptr->usado) = 1;
+            strcat(name, ".txt");
+            strncpy((ptr->target), name, 50);
+            fptr = openFile((ptr->target), 'a');
+            flag = 7;
+            break;
+
+        case 4:
+            xil_printf("Creando archivo");
+            break;
+        case 7:
             logNum++;
-            TempData = "Holaaaa";
+            TempData[50] = "Holaaaa";
             sprintf(dataPntr, "%s\n", TempData);
             dataPntr = dataPntr + 8;
             if (logNum % 10 == 0)
             {
                 xil_printf("\rUpdating SD card...\n\r");
-                writeFile(fptr, 80, (u32)dataBuffer);
+                writeFile(fptr, 50, (u32)dataBuffer);
                 dataPntr = (char *)dataBuffer;
             }
 
@@ -365,19 +379,13 @@ int main()
                 closeFile(fptr);
                 SD_Eject();
                 xil_printf("\rSafe to remove SD Card...\n\r");
-                
+                flag = 0;
             }
             else
             {
                 delay_ds(1);
-                
             }
             break;
-
-        case 4:
-            xil_printf("Creando archivo");
-            break;
-
         default:
             flag = 0;
             break;
