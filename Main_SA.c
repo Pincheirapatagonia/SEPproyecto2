@@ -351,11 +351,12 @@ int main()
             ptr = &cancion[2];
             name[50] = "caso_3";
             strncpy((ptr->nombre), name, 50);
-            (ptr->id) = sw_value;
+            (ptr->id) = 2;
             (ptr->usado) = 1;
             strcat(name, ".txt");
             strncpy((ptr->target), name, 50);
             fptr = openFile((ptr->target), 'a');
+            
             flag = 7;
             break;
 
@@ -364,7 +365,8 @@ int main()
             break;
         case 7:
             logNum++;
-            TempData[50] = "Holaaaa";
+            strncpy("Holaaaa", TempData, 50);
+            
             sprintf(dataPntr, "%s\n", TempData);
             dataPntr = dataPntr + 8;
             if (logNum % 10 == 0)
