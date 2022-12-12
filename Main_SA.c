@@ -366,13 +366,14 @@ int main()
         case 7:
             logNum++;
             strncpy(TempData, "Holaaaa", 50);
-            dataBuffer = &TempData;
+            //dataBuffer = &TempData;
 
             // dataPntr = dataPntr + 8;
             if (logNum % 10 == 0)
             {
                 xil_printf("\rUpdating SD card...\n\r");
-                writeFile(fptr, 50, (u32)dataBuffer);
+                //writeFile(fptr, 50, (u32)dataBuffer);
+                writeFile(fptr, 50, (u32)TempData);
                 dataPntr = (char *)dataBuffer;
             }
 
