@@ -236,7 +236,8 @@ int main()
                 (ptr->usado) = 1;
                 strcat(name, ".txt");
                 strncpy((ptr->target), name, 50);
-                fptr = openFile((ptr->target), "w");
+                fptr = openFile((ptr->target), "a");
+                fprintf(fptr, "%s", "This is tutorialspoint.com");
 
                 if (fptr == 0)
                     printf("File opening failed\n\r");
@@ -244,7 +245,7 @@ int main()
                 xil_printf("\r name is %s, saved in %s \r", (ptr->nombre), (ptr->target));
                 closeFile(fptr);
                 SD_Eject();
-                xil_printf("Safe to remove SD Card...\n\r")
+                xil_printf("Safe to remove SD Card...\n\r");
                 flag = 0;
             }
             break;
