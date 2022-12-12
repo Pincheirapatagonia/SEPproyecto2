@@ -108,8 +108,10 @@ static int SysMonSetupInterruptSystem(XScuGic *IntcInstancePtr,
 void delay_ds(int delay);
 void print_menu(void);
 void flashear(void);
+typedef unsigned char BYTE;
+void string2ByteArray(char *input, BYTE *output);
 
-//------Structs--------
+    //------Structs--------
 
 struct canciones
 {
@@ -195,6 +197,10 @@ int main()
     char dataBuffer[1024];
     char *dataPntr = dataBuffer;
     char TempData[50];
+
+    char ascii_str[] = "Hello world!";
+    int len = strlen(ascii_str);
+    BYTE arr[len];
     while (1)
     {
         switch (flag)
@@ -356,8 +362,9 @@ int main()
             strcat(name, ".txt");
             strncpy((ptr->target), name, 50);
             fptr = openFile((ptr->target), 'a');
-            
-            flag = 7;
+            logNum =0;
+
+                flag = 7;
             break;
 
         case 4:
@@ -371,9 +378,10 @@ int main()
             // dataPntr = dataPntr + 8;
             if (logNum % 10 == 0)
             {
+                string2ByteArray(ascii_str, arr);
                 xil_printf("\rUpdating SD card...\n\r");
                 //writeFile(fptr, 50, (u32)dataBuffer);
-                writeFile(fptr, 50, (u32)TempData);
+                writeFile(fptr, 50, (u32)arr[logNum]);
                 dataPntr = (char *)dataBuffer;
             }
 
@@ -410,6 +418,19 @@ void delay_ds(int delay)
     }
     //xil_printf("\r");
     
+}
+void string2ByteArray(char *input, BYTE *output)
+{
+    int loop;
+    int i;
+
+    loop = 0;
+    i = 0;
+
+    while (input[loop] != '\0')
+    {
+        output[i++] = input[loop++];
+    }
 }
 void print_menu(void)
 {
