@@ -378,7 +378,7 @@ int main()
 
             /* Read every line and display it */
             ReadFile(fptr, (u32) dataPntr);
-            xil_printf("%s", (char)dataPntr)
+            xil_printf("%s", (char)dataPntr);
 
                 /* Close the file */
 
@@ -390,13 +390,14 @@ int main()
             //dataBuffer = &TempData;
 
             // dataPntr = dataPntr + 8;
-            if (logNum % 10 == 0)
+            if (logNum % 2 == 0)
             {
                 string2ByteArray(ascii_str, arr);
                 xil_printf("\rUpdating SD card...\n\r");
-                //writeFile(fptr, 50, (u32)dataBuffer);
+                dataPntr = &TempData[logNum];
+                writeFile(fptr, 50, (u32)dataPntr);
                 //writeFile(fptr, 50, (u32)arr[logNum]);
-                dataPntr = &TempData[0];
+                
                 UINT btw;
                 FRESULT rc; // FRESULT variable
                 rc = f_write(fptr, (const void *)dataPntr, 80, &btw);
@@ -452,7 +453,7 @@ void string2ByteArray(char *input, BYTE *output)
 }
 void print_menu(void)
 {
-    xil_printf("\r--------------------------\r Menu: Utilice los sw para seleccionar una opción\r 1) Ingresar una nueva canción\r 2) RGB demo\r 3) Audio demo\r 4) SD demo\r --------------------------\r");
+    xil_printf("\r--------------------------\r Menu: Utilice los sw para seleccionar una opción\r 1) Ingresar una nueva canción\r 2) RGB demo\r 3) escribir demo\r 4) leer demo\r --------------------------\r");
 }
 void flashear(void)
 {
