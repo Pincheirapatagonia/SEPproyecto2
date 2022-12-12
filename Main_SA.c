@@ -349,7 +349,7 @@ int main()
 
         case 3: // Reproducir canción
             ptr = &cancion[2];
-            name[50] = "caso_3";
+            strncpy(name, "caso_3", 50);
             strncpy((ptr->nombre), name, 50);
             (ptr->id) = 2;
             (ptr->usado) = 1;
