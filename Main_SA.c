@@ -365,10 +365,10 @@ int main()
             break;
         case 7:
             logNum++;
-            strncpy("Holaaaa", TempData, 50);
-            
-            sprintf(dataPntr, "%s\n", TempData);
-            dataPntr = dataPntr + 8;
+            strncpy(TempData, "Holaaaa", 50);
+            dataBuffer = &TempData;
+
+            // dataPntr = dataPntr + 8;
             if (logNum % 10 == 0)
             {
                 xil_printf("\rUpdating SD card...\n\r");
