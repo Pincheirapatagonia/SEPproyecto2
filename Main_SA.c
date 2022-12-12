@@ -373,19 +373,16 @@ int main()
             xil_printf("\r leyendo archivo demo\r");
 
             /* Open a text file */
-            fr = f_open(&fptr, "demo.txt", FA_READ);
-            if (fr)
-                xil_printf((int)fr);
+            fptr = openFile("demo.txt", 'r');
+           
 
             /* Read every line and display it */
-            while (f_gets(line, sizeof line, &fptr))
-            {
-                xil_printf(line);
-            }
+            ReadFile(fptr, (u32) dataPntr);
+            xil_printf("%s", (char)dataPntr)
 
-            /* Close the file */
-            f_close(&fptr);
-            flag =0;
+                /* Close the file */
+
+                flag = 0;
             break;
         case 7:
             logNum++;
