@@ -381,8 +381,12 @@ int main()
                 string2ByteArray(ascii_str, arr);
                 xil_printf("\rUpdating SD card...\n\r");
                 //writeFile(fptr, 50, (u32)dataBuffer);
-                writeFile(fptr, 50, (u32)arr[logNum]);
-                dataPntr = (char *)dataBuffer;
+                //writeFile(fptr, 50, (u32)arr[logNum]);
+                dataPntr = &TempData[0]
+                UINT btw;
+                FRESULT rc; // FRESULT variable
+                rc = f_write(&fptr, , 80, &btw);
+                //dataPntr = (char *)dataBuffer;
             }
 
             if (logNum == MAX_LOG_NUM)
