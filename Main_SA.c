@@ -382,10 +382,10 @@ int main()
                 xil_printf("\rUpdating SD card...\n\r");
                 //writeFile(fptr, 50, (u32)dataBuffer);
                 //writeFile(fptr, 50, (u32)arr[logNum]);
-                dataPntr = &TempData[0]
+                dataPntr = &TempData[0];
                 UINT btw;
                 FRESULT rc; // FRESULT variable
-                rc = f_write(&fptr, , 80, &btw);
+                rc = f_write(fptr, (const void *)dataPntr, 80, &btw);
                 //dataPntr = (char *)dataBuffer;
             }
 
