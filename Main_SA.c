@@ -110,8 +110,10 @@ void print_menu(void);
 void flashear(void);
 typedef unsigned char BYTE;
 void string2ByteArray(char *input, BYTE *output);
+char line[100]; /* Line buffer */
+FRESULT fr;
 
-    //------Structs--------
+//------Structs--------
 
 struct canciones
 {
@@ -368,7 +370,22 @@ int main()
             break;
 
         case 4:
-            xil_printf("Creando archivo");
+            xil_printf("\r leyendo archivo demo\r");
+
+            /* Open a text file */
+            fr = f_open(&fptr, "demo.txt", FA_READ);
+            if (fr)
+                xil_printf((int)fr);
+
+            /* Read every line and display it */
+            while (f_gets(line, sizeof line, &fptr))
+            {
+                xil_printf(line);
+            }
+
+            /* Close the file */
+            f_close(&fptr);
+            flag =0;
             break;
         case 7:
             logNum++;
